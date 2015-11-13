@@ -32,6 +32,18 @@ group by query_job_id
 order by max(parsed_on) desc
 ```
 
+
+## Run in Docker
+
+This as closely as possible mimics a standard Civis Custom Script configuration:
+
+```bash
+$ docker run -i -t --rm \
+  -e "CIVIS_API_KEY=YOURapiKEYhere" -v $(pwd):/app -v /tmp:/data -w /app \
+  --name civis-name-parser -m 512M node:5.0.0 \
+  bash /app/run_script.sh  tableSchemaAndName idColumn nameColumn bucketName
+```
+
 # TODO
 
 * Inspect tables for data types
