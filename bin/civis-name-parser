@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+"use strict";
+
+const program = require('commander'),
+  util = require('util'),
+  chalk = require('chalk'),
+  moment = require('moment'),
+  numeral = require('numeral'),
+  pkg = require('../package'),
+  CliTable = require('cli-table'),
+  CivisClient = require('../lib/civis-client'),
+  Runner = require('../lib/runner');
+
+program
+  .version(pkg.version)
+  .arguments('<tableSchemaAndName> <idColumn> <nameColumn>')
+  .option('-k, --key [civisKey]', `Civis API key (defaults to ${chalk.grey('CIVIS_API_KEY')})`)
+  .option('-b, --bucket [bucketName]', `S3 Bucket Name (defaults ${chalk.grey('BUCKET_NAME')})`)
+  .option('-d, --destination [destination]', `Destination table (defaults to ${chalk.grey('parsed_names')} in the source table's schema`)
+  .action(function(tableSchemaAndName, idColumn, nameColumn) {
+
+    let apiKey = program.civisKey || process.env.CIVIS_API_KEY;
+
+    let bucketName = program.bucketName || process.env.BUCKET_NAME;
+
+
+    let tbl = new CliTable({colWidths: [25, 75]});
+    tbl.push(['Source', tableSchemaAndName],
+      ['Unique ID Column', idColumn],
+      ['Full Name Column', nameColumn],
+      ['Bucket', bucketName],
+      ['Destination Table', program.destination || '(default)']
+    );
+
+    console.log(chalk.blue('~~~~~~~~~~~~~~~~~ Name Parser ~~~~~~~~~~~~~~~~~'));
+    console.log(tbl.toString());
+
+
+    var civis = new CivisClient({apiKey: apiKey});
+    var runner = new Runner(civis);
+
+    runner.run(tableSchemaAndName, idColumn, nameColumn, bucketName, program.destination).then((result) => {
+      let elapsed = ((new Date()) - result.startTime) / 1000;
+      console.log(chalk.blue('~~~~~~~~~~~~~~~~~ SUMMARY ~~~~~~~~~~~~~~~~~'));
+
+      let tbl = new CliTable({
+        colWidths: [25, 75]
+      });
+
+      tbl.push(
+        ['Rows', numeral(result.rowCount).format('0,0')],
+        ['Destination', result.destinationTable],
+        ['Query Job ID', result.queryJobId],
+        ['Bucket', `${result.bucket}/${result.destinationPrefix}`],
+        ['Elapsed Time', `${numeral(elapsed).format('00:00:00')}${numeral(elapsed).format('.000')}`]
+      );
+
+      console.log(tbl.toString());
+
+    });
+
+  })
+  .parse(process.argv);
+
+if (!program.args.length) {
+  program.help();
+} else {
+  console.log(`Run ${chalk.yellow(pkg.name)}`);
+
+}
