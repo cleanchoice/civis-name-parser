@@ -13,8 +13,8 @@
   "keywords": [
     "civis"
   ],
-  "author": "Matt Klaber",
-  "license": "ISC",
+  "author": "Matt Klaber <klaber@gmail.com> (http://github.com/mklaber/)",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ethicalelectric/civis-name-parser/issues"
   },
