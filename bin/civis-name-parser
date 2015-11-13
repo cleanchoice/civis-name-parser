@@ -2,7 +2,6 @@
 "use strict";
 
 const program = require('commander'),
-  util = require('util'),
   chalk = require('chalk'),
   moment = require('moment'),
   numeral = require('numeral'),
@@ -16,32 +15,33 @@ program
   .arguments('<tableSchemaAndName> <idColumn> <nameColumn>')
   .option('-k, --key [civisKey]', `Civis API key (defaults to ${chalk.grey('CIVIS_API_KEY')})`)
   .option('-b, --bucket [bucketName]', `S3 Bucket Name (defaults ${chalk.grey('BUCKET_NAME')})`)
-  .option('-d, --destination [destination]', `Destination table (defaults to ${chalk.grey('parsed_names')} in the source table's schema`)
+  .option('-d, --destination [destination]', `Destination table (defaults to ${chalk.grey('parsed_names')} in the source table's schema)`)
   .action(function(tableSchemaAndName, idColumn, nameColumn) {
 
-    let apiKey = program.civisKey || process.env.CIVIS_API_KEY;
+    let apiKey = this.key || process.env.CIVIS_API_KEY;
 
-    let bucketName = program.bucketName || process.env.BUCKET_NAME;
-
+    let bucketName = this.bucket || process.env.BUCKET_NAME;
 
     let tbl = new CliTable({colWidths: [25, 75]});
-    tbl.push(['Source', tableSchemaAndName],
+
+    tbl.push(
+      ['Source', tableSchemaAndName],
       ['Unique ID Column', idColumn],
       ['Full Name Column', nameColumn],
-      ['Bucket', bucketName],
-      ['Destination Table', program.destination || '(default)']
+      ['Bucket', bucketName || chalk.red('(missing)')],
+      ['Destination Table', this.destination || '(default)']
     );
 
-    console.log(chalk.blue('~~~~~~~~~~~~~~~~~ Name Parser ~~~~~~~~~~~~~~~~~'));
+    console.log(chalk.yellow(`~~~~~~~~~~~~~~~~~ ${pkg.name} ~~~~~~~~~~~~~~~~~`));
     console.log(tbl.toString());
 
 
     var civis = new CivisClient({apiKey: apiKey});
     var runner = new Runner(civis);
 
-    runner.run(tableSchemaAndName, idColumn, nameColumn, bucketName, program.destination).then((result) => {
+    runner.run(tableSchemaAndName, idColumn, nameColumn, bucketName, this.destination).then((result) => {
       let elapsed = ((new Date()) - result.startTime) / 1000;
-      console.log(chalk.blue('~~~~~~~~~~~~~~~~~ SUMMARY ~~~~~~~~~~~~~~~~~'));
+      console.log(chalk.yellow('~~~~~~~~~~~~~~~~~ SUMMARY ~~~~~~~~~~~~~~~~~'));
 
       let tbl = new CliTable({
         colWidths: [25, 75]
@@ -64,7 +64,4 @@ program
 
 if (!program.args.length) {
   program.help();
-} else {
-  console.log(`Run ${chalk.yellow(pkg.name)}`);
-
 }
