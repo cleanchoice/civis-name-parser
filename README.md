@@ -53,7 +53,7 @@ If running locally, call `npm start` for usage instructions.
 If running as a Civis Custom Script, use the following settings:
 
 | Setting | Value |
---------------------
+|---------|-----------|
 | Git Repo URL | `github.com/ethicalelectric/civis-name-parser.git` |
 | Git Repo Reference | `master` |
 | Docker Image Name | `node:5.0.0` |
