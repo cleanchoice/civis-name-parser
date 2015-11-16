@@ -95,6 +95,16 @@ $ docker run -i -t --rm \
   bash /app/run_script.sh  tableSchemaAndName idColumn nameColumn bucketName
 ```
 
+## Test
+
+To run the test suite, you'll need Mocha:
+
+```bash
+npm install -g mocha
+```
+
+Then, run `npm test`.
+
 ## TODO
 
 * Inspect tables for data types
@@ -102,4 +112,5 @@ $ docker run -i -t --rm \
   * Creates the destination table
   * Loads S3 credentials to Civis
   * Creates Custom Script
+* Break out `name-parser.js` streams in to separate components to make it easier to test
 
