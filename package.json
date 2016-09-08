@@ -22,7 +22,7 @@
   "homepage": "https://github.com/ethicalelectric/civis-name-parser#readme",
   "dependencies": {
     "another-name-parser": "0.0.2",
-    "aws-sdk": "^2.2.16",
+    "aws-sdk": "^2.5.6",
     "bluebird": "^3.0.5",
     "chalk": "^1.1.1",
     "cli-table": "^0.3.1",
