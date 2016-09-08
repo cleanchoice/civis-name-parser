@@ -15,6 +15,7 @@ const chai = require('chai'),
 
 chai.use(chaiAsPromised);
 chai.use(sinonChai);
+chai.use(require('chai-things'));
 
 describe('name-parser', () => {
 
@@ -28,7 +29,8 @@ describe('name-parser', () => {
     mockS3ReadStream,
     stubOfAws,
     ProxySut,
-    instanceOfStubOfAws;
+    instanceOfStubOfAws,
+    streamToPromise;
 
   function getMockStream() {
     var stream = sinon.stub({
@@ -61,6 +63,13 @@ describe('name-parser', () => {
       createReadStream: () => {}
     });
     mockAwsObjectStream.createReadStream.returns(mockS3ReadStream);
+    streamToPromise = (stream) => {
+      return {
+        then : () => {
+          return Promise.resolve();
+        }
+      }
+    }
 
     var S3 = class {
       constructor() {
@@ -79,14 +88,18 @@ describe('name-parser', () => {
         return this._getObjectArgs;
       }
       getObject(obj) {
-        console.log('calling getobject');
-        this._getObjectArgs.push(arguments);
+        this._getObjectArgs.push(arguments[0]);
         return mockAwsObjectStream;
       }
       listObjects(obj, cb) {
-        this._listObjectsArgs.push(arguments);
+        this._listObjectsArgs.push(arguments[0]);
         cb(null, {
           Contents: this._listObjectsToReturn
+        });
+      }
+      get config() {
+        return sinon.stub({
+          setPromisesDependency: () => {}
         });
       }
     };
@@ -97,7 +110,8 @@ describe('name-parser', () => {
 
 
     ProxySut = proxyquire('../../lib/name-parser', {
-      'aws-sdk': stubOfAws
+      'aws-sdk': stubOfAws,
+      './stream-to-promise': streamToPromise
     });
 
   });
@@ -117,11 +131,11 @@ describe('name-parser', () => {
     ProxySut.parse(mockResult).then(() => {
 
       // first argument of first call of listObject
-      expect(instanceOfStubOfAws.listObjectArgs[0][0])
+      expect(instanceOfStubOfAws.listObjectArgs[0])
         .to.have.property('Bucket')
         .that.eql(mockBucket + '/');
 
-      expect(instanceOfStubOfAws.listObjectArgs[0][0])
+      expect(instanceOfStubOfAws.listObjectArgs[0])
         .to.have.property('Prefix')
         .that.eql(mockResult.sourcePrefix);
 
@@ -130,29 +144,38 @@ describe('name-parser', () => {
     }).catch(done);
 
   });
-
-  /* // this doesn't work because the streams are never finishing... blerg.
+  
   it('creates a stream for each listed object', (done) => {
 
-    instanceOfStubOfAws.listObjectsToReturn = [
+    let listObjsToReturn = [
+      {Key: chance.word()},
+      {Key: chance.word()},
+      {Key: chance.word()},
       {Key: chance.word()},
       {Key: chance.word()}
     ];
+    instanceOfStubOfAws.listObjectsToReturn = listObjsToReturn;
 
     ProxySut.parse(mockResult).then(() => {
-
-
+      
       expect(instanceOfStubOfAws.getObjectArgs)
-        .to.have.length(instanceOfStubOfAws.listObjectsToReturn.length);
+        .to.have.length(listObjsToReturn.length);
+      
+      expect(instanceOfStubOfAws.getObjectArgs)
+        .to.all.have.property('Bucket', mockBucket);
+  
+      expect(instanceOfStubOfAws.getObjectArgs)
+        .to.all.have.property('Key');
+      
+      for(var obj of listObjsToReturn) {
+        expect(instanceOfStubOfAws.getObjectArgs).to.contain.a.thing.with.property('Key', obj.Key);
+      }
 
-
-
-      console.log(instanceOfStubOfAws);
       done();
     }).catch(done);
 
   });
-*/
+
 
 
 });
