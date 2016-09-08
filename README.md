@@ -31,7 +31,7 @@ Then, create the following table in a schema of your choice:
 ```sql
 create table schema.parsed_names (
   query_job_id int not null,
-  source_id int not null,
+  source_id varchar not null,
   full_name varchar(100),
   title varchar(10),
   first_name varchar(25),

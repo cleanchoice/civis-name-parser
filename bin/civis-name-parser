@@ -32,6 +32,7 @@ program
       ['Destination Table', this.destination || '(default)']
     );
 
+    console.log(chalk.gray(`${pkg.name} version is ${pkg.version}`));
     console.log(chalk.yellow(`~~~~~~~~~~~~~~~~~ ${pkg.name} ~~~~~~~~~~~~~~~~~`));
     console.log(tbl.toString());
 
