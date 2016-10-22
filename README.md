@@ -54,7 +54,7 @@ If running as a Civis Custom Script, use the following settings:
 
 | Setting | Value |
 |---------|-----------|
-| Git Repo URL | `github.com/ethicalelectric/civis-name-parser.git` |
+| Git Repo URL | `github.com/cleanchoice/civis-name-parser.git` |
 | Git Repo Reference | `master` |
 | Docker Image Name | `node:5.0.0` |
 | Command | `bash /app/run_script.sh some_schema.names_to_parse name_of_unique_id_column name_of_full_name_column name-of-accessible-bucket` (where `name-of-accessible-bucket` is a bucket accessible to the S3 credential you've loaded in to Civis Platform) |
