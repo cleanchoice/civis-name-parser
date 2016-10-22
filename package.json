@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ethicalelectric/civis-name-parser.git"
+    "url": "git+https://github.com/cleanchoice/civis-name-parser.git"
   },
   "keywords": [
     "civis"
@@ -17,9 +17,9 @@
   "author": "Matt Klaber <klaber@gmail.com> (http://github.com/mklaber/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ethicalelectric/civis-name-parser/issues"
+    "url": "https://github.com/cleanchoice/civis-name-parser/issues"
   },
-  "homepage": "https://github.com/ethicalelectric/civis-name-parser#readme",
+  "homepage": "https://github.com/cleanchoice/civis-name-parser#readme",
   "dependencies": {
     "another-name-parser": "0.0.2",
     "aws-sdk": "^2.5.6",
